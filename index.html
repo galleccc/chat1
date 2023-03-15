@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- <div>
+    <input type="text" id="int">
+    <button id="but">send</button>
+  </div>--> 
+  <div class="data"></div>
+  <div class="block">
+    <p>User</p>
+    <input type="text" class="userName">
+    <p>password</p>
+    <input type="text" class="pass">
+    <button class="btn">send</button>
+  </div>
+  <div class="none">
+    <input type="text" id="message">
+    <button id="messageBtn">send</button>
+    <button id="btn1">add file</button>
+    <div class="data"></div>
+  </div>
+<script type="module">
+// Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+        import { getDatabase, set, update, ref ,push, child, onValue, get} from
+        "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+    
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyDlmKx--kMF4Wo59AeOzCf-5XhNPaOBsGY",
+      authDomain: "chat-286c2.firebaseapp.com",
+      projectId: "chat-286c2",
+      storageBucket: "chat-286c2.appspot.com",
+      messagingSenderId: "1047026169847",
+      appId: "1:1047026169847:web:5c00213c513f076dfb20f2",
+      measurementId: "G-235Q42LNXR",
+      databaseURL: "https://chat-286c2-default-rtdb.europe-west1.firebasedatabase.app/"
+    };
+    
+    // // Initialize Firebase
+    // const app = initializeApp(firebaseConfig);
+    //     const database = getDatabase(app);
+    //     const starCountRef1 = ref(database, 'test');
+    //     onValue(starCountRef1, (snapshot) => {
+    //     snapshot.forEach(childSnapshot => {
+    //         // console.log(childSnapshot.val());
+    //         // const data = childSnapshot.val();
+    //         // const key = childSnapshot.key;
+    //         // let para = document.createElement("p");
+    //         // para.innerHTML = data + " " + key;
+    //         // para.id = "id" + key;
+    //         // document.querySelector('.data').appendChild(para);
+    //     })
+    //     let int = document.getElementById ("int")
+    //     let but = document.getElementById ("but")
+    //     but.addEventListener ("click", () =>{
+    //       update(ref(database, 'test/'), {
+    //     3:as,
+    //     })
+    // });
+    //   })
+    //   btn.addEventListener ("click", () => {
+    //     set(ref(database, 'users/' + userName.value), {
+    //   name: userName.value,
+    //   pass: pass.value,
+    //   })
+    //   })
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const starCountRef1 = ref(database, 'posts');
+    // onValue(starCountRef1, (snapshot) => {
+    //     snapshot.forEach(childSnapshot => {
+    //         // console.log(childSnapshot.val());
+    //         // const data = childSnapshot.val();
+    //         // const key = childSnapshot.key;
+    //         // let para = document.createElement("p");
+    //         // para.innerHTML = data + " " + key;
+    //         // para.id = "id" + key;
+    //         // document.querySelector('.data').appendChild(para);
+    //     })
+    // })
+    onValue(starCountRef1, (snapshot) => {
+        snapshot.forEach(childSnapshot => {
+            console.log(childSnapshot.val());
+            const name = childSnapshot.val().name;
+            const key = childSnapshot.key;
+            const post = childSnapshot.val().post;
+            let para = document.createElement("p");
+            para.innerHTML = name + " " + post;
+            para.id = "id" + key;
+            document.querySelector('.data').appendChild(para);
+        })
+    })
+
+    // update(ref(database, 'test/'), { 
+    //         3: "bye",
+    // });
+
+    const btn = document.querySelector(".btn");
+    const userName = document.querySelector(".userName");
+    const pass = document.querySelector(".pass");
+    const none = document.querySelector (".none");
+    const block = document.querySelector (".block")
+    const messageBtn = document.getElementById("messageBtn");
+    const message = document.getElementById("message");
+    let usersArray = [];
+    let passArray = [];
+
+    const starCountRef2 = ref(database, 'users');
+        onValue(starCountRef2, (snapshot) => {
+            snapshot.forEach(childSnapshot => {
+                console.log(childSnapshot.val().name);
+                usersArray.push(childSnapshot.val().name);
+                passArray.push(childSnapshot.val().pass)
+                console.log(usersArray);
+            })
+        
+        
+        messageBtn.addEventListener("click", () => {
+        const myName = localStorage.getItem("userName");
+        document.querySelector('.data').innerHTML = "";
+        const now = Date.now();
+        set(ref(database, 'posts/' + now), { 
+            name: myName,
+            post: message.value
+        });
+        })
+
+
+    btn.addEventListener("click", () => {
+        if (!usersArray.includes(userName.value)) {
+            set(ref(database, 'users/' + userName.value), {
+                        name: userName.value,
+                        pass: pass.value,
+                    })
+                    // none.classList.add("block");
+                    // block.classList.add("none");
+                    // none.classList.add("block");
+                    // none.classList.remove("none");
+                    // block.classList.add("none");
+                    // block.classList.remove("block");
+                    alert("ви зареєструвалися!");
+        } else {
+            const index = usersArray.indexOf(userName.value);
+
+            if (passArray[index] == pass.value) {
+                localStorage.setItem("userName", userName.value);
+                alert("ви увійшли!");
+                none.classList.add("block");
+                    none.classList.remove("none");
+                    block.classList.add("none");
+                    block.classList.remove("block");
+            } else {
+                alert("таке імя вже існує або неправильний пароль!");
+            }
+        }
+    })    
+})
+const fileInput = document.getElementById('file-input');
+const btn1 = document.getElementById('btn1');
+    btn1.addEventListener("click", () => {
+        const file = fileInput.files[0];
+
+    // Create a reference to the file in Firebase Storage
+    const fileRef = storageRef.child(file.name);
+
+    // Upload the file to Firebase Storage
+    fileRef.put(file).then(() => {
+    console.log('File uploaded successfully!');
+    }).catch((error) => {
+    console.error('Error uploading file:', error);
+    });
+
+        
+
+    })
+</script>
+</body>
+</html>
+<!-- Svjat, [13.03.2023 18:20]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    user
+    <input type="text" id="userName">
+    pass
+    <input type="text" id="pass">
+    <button id="btn">go</button>
+    <input type="file" id="file-input" name="myFile">
+    <button id="btn1">add file</button>
+    <input type="text" id="message" name="message">
+    <button id="messageBtn">send message</button>
+    <div class="data"></div>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+        import { getDatabase, set, update, ref ,push, child, onValue, get} from
+        "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+    
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+    
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+        apiKey: "AIzaSyDO4jPM5gRhvtKvPo05hrWlDz7hOirTQww",
+        authDomain: "trivia-for-two.firebaseapp.com",
+        projectId: "trivia-for-two",
+        storageBucket: "trivia-for-two.appspot.com",
+        messagingSenderId: "194595752794",
+        appId: "1:194595752794:web:c6ea94b7350bfe3f46c163",
+        databaseURL: "https://trivia-for-two-default-rtdb.europe-west1.firebasedatabase.app"
+      };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const starCountRef1 = ref(database, 'posts');
+    onValue(starCountRef1, (snapshot) => {
+        snapshot.forEach(childSnapshot => {
+            console.log(childSnapshot.val());
+            const name = childSnapshot.val().name;
+            const key = childSnapshot.key;
+            const post = childSnapshot.val().post;
+            let para = document.createElement("p");
+            para.innerHTML = name + " " + post;
+            para.id = "id" + key;
+            document.querySelector('.data').appendChild(para);
+        })
+    })
+
+    const btn = document.getElementById("btn");
+    const userName = document.getElementById("userName");
+    const pass = document.getElementById("pass");
+
+    const messageBtn = document.getElementById("messageBtn");
+    const message = document.getElementById("message");
+
+    let usersArray = [];
+    let passArray = [];
+
+    const starCountRef2 = ref(database, 'users');
+        onValue(starCountRef2, (snapshot) => {
+            snapshot.forEach(childSnapshot => {
+                console.log(childSnapshot.val().name);
+                usersArray.push(childSnapshot.val().name);
+                passArray.push(childSnapshot.val().pass)
+                console.log(usersArray);
+        })
+
+    messageBtn.addEventListener("click", () => {
+        const myName = localStorage.getItem("userName");
+        document.querySelector('.data').innerHTML = "";
+        const now = Date.now();
+        set(ref(database, 'posts/' + now), { 
+            name: myName,
+            post: message.value
+        });
+    })
+
+
+    btn.addEventListener("click", () => {
+        if (!usersArray.includes(userName.value)) {
+            set(ref(database, 'users/' + userName.value), {
+                        name: userName.value,
+                        pass: pass.value,
+                    })
+
+                    alert("ви зареєструвалися!");
+        } else {
+            const index = usersArray.indexOf(userName.value);
+
+            if (passArray[index] == pass.value) {
+                localStorage.setItem("userName", userName.value);
+                alert("ви увійшли!");
+            } else {
+                alert("таке імя вже існує або неправильний пароль!");
+            }
+        }
+    })    
+})
+
+const fileInput = document.getElementById('file-input');
+const btn1 = document.getElementById('btn1');
+
+Svjat, [13.03.2023 18:20]
+btn1.addEventListener("click", () => {
+    const file = fileInput.files[0];
+
+// Create a reference to the file in Firebase Storage
+const fileRef = storageRef.child(file.name);
+
+// Upload the file to Firebase Storage
+fileRef.put(file).then(() => {
+  console.log('File uploaded successfully!');
+}).catch((error) => {
+  console.error('Error uploading file:', error);
+});
+
+    
+
+})
+
+
+
+    </script>
+</body>
+</html> -->
